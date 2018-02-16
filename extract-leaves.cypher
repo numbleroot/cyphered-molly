@@ -6,4 +6,4 @@ ORDER BY pLen DESC
 WITH DISTINCT rule
 MATCH (rule)-[*1]->(leaf:Goal {run: 999})
 
-RETURN rule, collect(leaf) AS leaves
+RETURN rule, collect(leaf) AS leaves;
