@@ -1,11 +1,11 @@
 CALL apoc.export.cypher.query("
-    MATCH pathFail = (rootFail:Goal {run: 2})-[*0..]->(:Goal {run: 2})
+    MATCH pathFail = (rootFail:Goal {run: 1, condition: \"post\"})-[*0..]->(:Goal {run: 1, condition: \"post\"})
     WHERE NOT ()-->(rootFail)
     WITH reduce(s = '', n IN NODES(pathFail) | s + '(' + n.label + ');') AS stringFail, length(pathFail) AS lenFail
     ORDER BY lenFail DESC
     WITH collect(stringFail) AS failPaths
 
-    MATCH pathSucc = (rootSucc:Goal {run: 0})-[*0..]->(:Goal {run: 0})
+    MATCH pathSucc = (rootSucc:Goal {run: 0, condition: \"post\"})-[*0..]->(:Goal {run: 0, condition: \"post\"})
     WHERE NOT ()-->(rootSucc)
     WITH pathSucc, reduce(s = '', n IN NODES(pathSucc) | s + '(' + n.label + ');') AS stringSucc, LENGTH(pathSucc) AS lenSucc, failPaths
     ORDER BY lenSucc DESC

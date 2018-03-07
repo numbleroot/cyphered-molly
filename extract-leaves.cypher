@@ -1,7 +1,12 @@
-MATCH path = (root:Goal {run: 999})-[*0..]->(rule:Rule {run: 999})-[*1]->(leaf:Goal {run: 999})
+MATCH path = (root:Goal {run: 999})-[*0..]->(:Rule {run: 999})-[*1]->(leaf:Goal {run: 999})
 WHERE NOT ()-->(root) AND NOT (leaf)-->()
-WITH path, rule, length(path) AS pLen
-ORDER BY pLen DESC
+WITH length(path) AS maxLen
+ORDER BY maxLen DESC
+LIMIT 1
+WITH maxLen
+
+MATCH path = (root:Goal {run: 999})-[*0..]->(rule:Rule {run: 999})-[*1]->(leaf:Goal {run: 999})
+WHERE NOT ()-->(root) AND NOT (leaf)-->() AND length(path) = maxLen
 
 WITH DISTINCT rule
 MATCH (rule)-[*1]->(leaf:Goal {run: 999})
