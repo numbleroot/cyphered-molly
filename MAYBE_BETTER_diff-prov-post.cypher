@@ -1,5 +1,5 @@
 CALL apoc.export.cypher.query("
-    MATCH (n:Goal {run: 1, condition: \"post\"})
+    MATCH (n:Goal {run: #RUN#, condition: \"post\"})
     WITH collect(n.label) AS failGoals
 
     MATCH pathSucc = (m:Goal {run: 0, condition: \"post\"})-[*0..]->(l:Goal {run: 0, condition: \"post\"})
