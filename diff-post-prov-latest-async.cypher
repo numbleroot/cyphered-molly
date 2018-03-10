@@ -1,4 +1,4 @@
-MATCH path = (root:Goal {run: 999})-[*0..]->(asyncGoal:Goal {run: 999})-[*1]->(asyncRule:Rule {run: 999})-[*1]->(:Goal)
+MATCH path = (root:Goal {run: #RUN#})-[*0..]->(asyncGoal:Goal {run: #RUN#})-[*1]->(asyncRule:Rule {run: #RUN#})-[*1]->(:Goal)
 WHERE NOT ()-->(root) AND asyncGoal.table IN #ASYNC_RULES_LIST#
 WITH path, asyncGoal, asyncRule, length(path) AS pLen
 ORDER BY pLen ASC
