@@ -1,11 +1,13 @@
-MATCH path = (root:Goal {run: #RUN#})-[*0..]->(asyncGoal:Goal {run: #RUN#})-[*1]->(asyncRule:Rule {run: #RUN#})-[*1]->(:Goal)
+MATCH (roots:Goal {run: #RUN#})
+WHERE NOT ()-->(roots)
+WITH size(collect(roots)) AS numRoots
+
+MATCH path = (root:Goal {run: #RUN#})-[*0..]->(asyncGoal:Goal {run: #RUN#})-[*1]->(asyncRule:Rule {run: #RUN#})-[*1]->(asyncClock:Goal {table: "clock", run: #RUN#})
 WHERE NOT ()-->(root) AND asyncGoal.table IN #ASYNC_RULES_LIST#
-WITH path, asyncGoal, asyncRule, length(path) AS pLen
-ORDER BY pLen ASC
+WITH asyncGoal, asyncRule, asyncClock, length(path) AS pLen, numRoots
+ORDER BY pLen DESC
 LIMIT 1
-WITH path, asyncGoal, asyncRule, pLen
 
-MATCH resPath = (asyncGoal)-[*1]->(asyncRule)-[*1]->(asyncClock:Goal {table: "clock"})
-WITH split(split(asyncGoal.label, "(")[1], ",")[0] AS node, asyncGoal.table AS rule, split(split(asyncGoal.label, ", ")[-1], ")")[0] AS eventTime, split(split(asyncClock.label, "(")[1], ",")[0] AS sender
+WITH split(split(asyncGoal.label, "(")[1], ",")[0] AS node, asyncGoal.table AS rule, split(split(asyncGoal.label, ", ")[-1], ")")[0] AS eventTime, split(split(asyncClock.label, "(")[1], ",")[0] AS sender, numRoots
 
-RETURN node, rule, eventTime, sender;
+RETURN node, rule, eventTime, sender, numRoots;
