@@ -1,21 +1,13 @@
 CALL apoc.export.cypher.query("
-    MATCH pathFail = (rootFail:Goal {run: 1, condition: \"post\"})-[*0..]->(:Goal {run: 1, condition: \"post\"})
-    WHERE NOT ()-->(rootFail)
-    WITH reduce(s = '', n IN NODES(pathFail) | s + '(' + n.label + ');') AS stringFail, length(pathFail) AS lenFail
-    ORDER BY lenFail DESC
-    WITH collect(stringFail) AS failPaths
+    MATCH (n:Goal {run: #RUN#, condition: \"post\"})
+    WITH collect(n.label) AS failGoals
 
-    MATCH pathSucc = (rootSucc:Goal {run: 0, condition: \"post\"})-[*0..]->(:Goal {run: 0, condition: \"post\"})
-    WHERE NOT ()-->(rootSucc)
-    WITH pathSucc, reduce(s = '', n IN NODES(pathSucc) | s + '(' + n.label + ');') AS stringSucc, LENGTH(pathSucc) AS lenSucc, failPaths
-    ORDER BY lenSucc DESC
+    MATCH pathSucc = (m:Goal {run: 0, condition: \"post\"})-[*0..]->(l:Goal {run: 0, condition: \"post\"})
+    WHERE NOT m.label IN failGoals AND NOT l.label IN failGoals
 
-    WITH pathSucc, stringSucc, failPaths, reduce(found = 0, fPath IN failPaths | (CASE WHEN stringSucc CONTAINS fPath THEN found + 1 ELSE found + 0 END)) AS found
-    WITH CASE WHEN found = 0 THEN pathSucc ELSE '' END AS path
-
-    WITH filter(p IN collect(path) WHERE NOT p = '') AS diffPaths
-    RETURN diffPaths;",
+    RETURN pathSucc;",
     "/tmp/diff-succ-fail.cypher",
     {format:"plain",cypherFormat:"create"}) YIELD file, source, format, nodes, relationships, properties, time
 
 RETURN file, source, format, nodes, relationships, properties, time;
+
